@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <ip>127.0.0.1</ip>
+  <port>5005</port>
+  <login>SuperAdmin</login>
+  <password>SuperAdmin</password>
+
+  <db_host>localhost</db_host>
+  <db_user>maniacontrol</db_user>
+  <db_password>maniacontrol1234</db_password>
+  <db_name>maniacontrol</db_name>
+
+  <plugins>
+    <plugin>plugin.database.php</plugin>
+    <plugin>plugin.infomessages.php</plugin>
+  </plugins>
+  
+  <admins>
+    <admin>YOUR_MP_LOGIN</admin>
+  </admins>
+</settings>
