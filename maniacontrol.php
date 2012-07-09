@@ -26,7 +26,8 @@
 require_once('includes/GbxRemote.inc.php');
 define('nl', "\r\n");
 @set_time_limit(0);
-
+ini_set('max_execution_time', 0);
+ini_set('max_input_time', -1);
 
 class ManiaControl {
   public $settings, $isStartup = true, $run = true;
