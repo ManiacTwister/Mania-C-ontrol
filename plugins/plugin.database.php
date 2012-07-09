@@ -117,8 +117,10 @@ function db_ModeScriptCallback($control, $name, $params) {
 
 function showScores($control, $limit=6) {
   global $mlid, $whats;
+  $lheight = 1.7;
+  
   // Template copyright by undef.de - Take a look at the awesome Records eyepiece plugin for XAseco: http://www.labs.undef.de/XAseco2/Records-Eyepiece.php
-  $widgetheight = (1.8 * $limit + 3.3);
+  $widgetheight = ($lheight * $limit + 3.3);
   $x = 47.5;
   $tpl  = '<manialink id="%id%">';
 	$tpl .= '<frame posn="-63.5 %x% 0" id="Container3444">';
@@ -142,9 +144,10 @@ function showScores($control, $limit=6) {
     $offset = 3;
     
     foreach ($scores as &$item) {
-      $body .= '<label posn="4 -'. (1.8 * $line + $offset) .' 0.002" sizen="3.4 1.7" halign="right" scale="0.9" textcolor="DDDF" text="'.formatScore($item[1], $what).'"/>';
-      $body .= '<label posn="4.65 -'. (1.8 * $line + $offset) .' 0.002" sizen="11.1 1.7" scale="0.9" text="'.$item[0].'"/>';
-
+      $y = number_format(($lheight * $line + $offset), 1, '.', ',');
+      $body .= '<label posn="4 -'.$y.' 0.002" sizen="3.4 1.7" halign="right" scale="0.9" textcolor="DDDF" text="'.formatScore($item[1], $what).'"/>';
+      $body .= '<label posn="4.65 -'.$y.' 0.002" sizen="11.1 1.7" scale="0.9" text="'.$item[0].'"/>';
+      echo $y.nl;
       $line ++;
 
       if ($line >= $limit) {

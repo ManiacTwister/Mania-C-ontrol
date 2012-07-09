@@ -36,39 +36,41 @@ class ManiaControl {
     $this->loadSettings();
         
     $this->client = new IXR_Client_Gbx();
-    echo 'Connecting to ' . strval($this->settings['ip']) . ':' . strval($this->settings['port']) . ' ...' . nl;
+    $this->sendConsole('Connecting to ' . strval($this->settings['ip']) . ':' . strval($this->settings['port']) . ' ...');
     if (!$this->client->InitWithIp(strval($this->settings['ip']), intval($this->settings['port']))) {
         $this->errorcheck();
-        die('[Error] Could not connect to the server!' . nl);
+        $this->sendConsole('[Error] Could not connect to the server!', 3);
     }
-    echo 'Login as ' . strval($this->settings['login']) . '...' . nl;
+    $this->sendConsole('Login as ' . strval($this->settings['login']) . '...');
     if (!$this->client->query('Authenticate', strval($this->settings['login']), strval($this->settings['password']))) {
         $this->errorcheck();
-        die('[Error] Wrong username and/or password!' . nl);
+        $this->sendConsole('[Error] Wrong username and/or password!', 3);
     }
-    echo 'Enabling callbacks ...' . nl;
+    $this->sendConsole('Enabling callbacks ...');
     if (!$this->client->query('EnableCallbacks', true)) {
         $this->errorcheck();
-        die('[Error] Could not activate callbacks!' . nl);
+        $this->sendConsole('[Error] Could not activate callbacks!', 3);
     }
-    echo 'Setting API version ...'.nl;
+    $this->sendConsole('Setting API version ...');
     if(!$this->client->query('SetApiVersion', '2012-06-19')) {
         $this->errorcheck();
-        die('[Error] Could not set API version' . nl);
+        $this->sendConsole('[Error] Could not set API version', 3);
     }
-    echo 'Resetting Manialinkpages ...' . nl;
+    $this->sendConsole('Resetting Manialinkpages ...');
     if (!$this->client->query('SendHideManialinkPage')) {
         $this->errorcheck();
-        die('[Error] Could not reset Manialinkpages!' . nl);
+        $this->sendConsole('[Error] Could not reset Manialinkpages!', 3);
     }        
-    echo '... Done!' . nl;
+    $this->sendConsole('... Done!');
     $this->client->query('GetSystemInfo');
     $response = $this->client->getResponse();
-    echo '######################'. nl;
-    echo '# Connected with:' . nl;
-    echo '# IP: '.$response['PublishedIp'].':'.$response['Port'] .nl;
-    echo '# Login: '.$response['ServerLogin'] .nl;
-    echo '######################'. nl;
+    $this->sendConsole(
+    '######################'.nl.
+    '# Connected with:'.nl.
+    '# IP: '.$response['PublishedIp'].':'.$response['Port'].nl.
+    '# Login: '.$response['ServerLogin'].nl.
+    '######################'
+    , 4);
     $this->client->query('EnableCallbacks', true);
     $this->client->query('ChatSendServerMessage', '$o$aaaMania$09f[C]$aaaontrol started!');
     $this->serverlogin = $response['ServerLogin'];
@@ -85,42 +87,54 @@ class ManiaControl {
       foreach($calls as $call) {
         $name = $call[0];
         $data = $call[1];
-        set_time_limit(20);
         switch ($name) {
           case 'ManiaPlanet.PlayerConnect':
-            $this->client->query('GetDetailedPlayerInfo', $calls[0][1][0]);
+            $this->client->query('GetDetailedPlayerInfo', $call[1][0]);
             $response = $this->client->getResponse();
             $response['joined'] = time();
-            $this->players[$calls[0][1][0]] = $response;
+            $this->players[$call[1][0]] = $response;
             $this->releaseEvent('PlayerConnect', $response, '');
-            $this->client->query('ChatSendServerMessage', '$z$sNew Player: '.$response['NickName'].'$z$s Zone: $fff'.$response['Path'].'$z$s Ladder: $fff'.$response['LadderStats']['PlayerRankings'][0]['Ranking']);
-            $this->client->query('GetServerName');
-            $response = $this->client->getResponse();
-            $this->client->query('ChatSendServerMessageToLogin', '$z$sWelcome on '.$response.nl.'$z$sThis Server is running with $l[https://github.com/ManiacTwister/Mania-C-ontrol]$o$aaaMania$09f[C]$aaaontrol$l!', $calls[0][1][0]);
             break;
           case 'ManiaPlanet.PlayerDisconnect':
-            $this->releaseEvent('PlayerDisconnect', $this->players[$calls[0][1][0]], '');
-            $this->client->query('ChatSendServerMessage', '$z$sPlayer Left: '.$this->players[$calls[0][1][0]]['NickName'].'$z');
-            unset($this->players[$calls[0][1][0]]);
+            $this->releaseEvent('PlayerDisconnect', $this->players[$call[1][0]], '');
+            unset($this->players[$call[1][0]]);
             break;
           case 'ManiaPlanet.ModeScriptCallback':
-            $this->releaseEvent('ModeScriptCallback', $calls[0][1][0], (isset($calls[0][1][1]) ? $calls[0][1][1] : ''));
+            $this->releaseEvent('ModeScriptCallback', $call[1][0], (isset($call[1][1]) ? $call[1][1] : ''));
             break;
           case 'ManiaPlanet.PlayerChat':
-            if($this->StartsWith($calls[0][1][2], "/")) {
-              $command = explode(" ", $calls[0][1][2], 2);
+            if($this->StartsWith($call[1][2], "/")) {
+              $command = explode(" ", $call[1][2], 2);
               if(isset($command[1])) {
                 $params = explode(" ", $command[1]);
               } else {
                 $params = array();
               }
-              $this->handleCommand($calls[0][1][1], str_replace("/", "", $command[0]), $params);
+              $this->handleCommand($call[1][1], str_replace("/", "", $command[0]), $params);
             } else {
-              $this->releaseEvent('PlayerChat', $calls[0][1]);
+              $this->releaseEvent('PlayerChat', $call[1]);
             }
             break;
-            default:
-            
+          case 'ManiaPlanet.PlayerInfoChanged':
+            $this->releaseEvent('PlayerInfoChanged', $call[1][0]);
+            break;
+          case 'ManiaPlanet.VoteUpdated':
+            $this->releaseEvent('VoteUpdated', $call[1]);
+            break;
+          case 'ManiaPlanet.BeginMap':
+            $this->releaseEvent('BeginMap', $call[1][0]);
+            break;
+          case 'ManiaPlanet.EndMap':
+            $this->releaseEvent('EndMap', $call[1][0]);
+            break;
+          case 'ManiaPlanet.StatusChanged':
+            $this->releaseEvent('StatusChanged', $call[1]);
+            break;
+          case 'ManiaPlanet.MapListModified':
+            $this->releaseEvent('MapListModified', $call[1]);
+            break;
+          default:
+            //print_r($call);
           // TODO: Implement all callbacks
         }
         $this->errorcheck();
@@ -141,6 +155,7 @@ class ManiaControl {
   function loadSettings($config = 'config/config.xml') {
     $this->settings = array();
     if($xml = @simplexml_load_file($config)){
+      $this->sendConsole('Loading config file ...');
       $this->settings['ip'] = $xml->ip;
       $this->settings['port'] = $xml->port;
       $this->settings['login'] = $xml->login;
@@ -154,18 +169,19 @@ class ManiaControl {
       foreach($xml->admins->admin as $admin) {
         $this->settings['admins'][] = (string)$admin;
       }
+      $this->sendConsole('... Done!');
       $this->loadPlugins();
-      
-      echo '###############################################################################'. nl;
-      echo '#'. nl;
-      echo '# Mania[C]ontrol running on'.$this->settings['ip'].':'.$this->settings['port']. nl;
-      echo '#'. nl;
-      echo '# Author: ManiacTwister (Some ideas from XAseco by Xymph)'. nl;
-      echo '#'. nl;
-      echo '###############################################################################'. nl;
-      echo 'Loading config file ...' . nl;
+      $this->sendConsole(
+        '###############################################################################'.nl.
+        '#'.nl.
+        '# Mania[C]ontrol running on '.$this->settings['ip'].':'.$this->settings['port'].nl.
+        '#'.nl.
+        '# Author: ManiacTwister (Some ideas from XAseco by Xymph)'. nl.
+        '#'.nl.
+        '###############################################################################'
+      , 4);
     } else { 
-      die('[Error] Could not load config file!' . nl); 
+      $this->sendConsole('Could not load config file!', 3); 
     }
   }
   
@@ -173,7 +189,7 @@ class ManiaControl {
     foreach($this->settings['plugins']->plugin as $plugin) {
       require_once('plugins/' . $plugin);
       $this->plugins[] = $plugin;
-      echo "Loading [".$plugin."] ...".nl;
+      $this->sendConsole('Loading ['.$plugin.'] ...');
     }
   }
   
@@ -225,6 +241,26 @@ class ManiaControl {
   
   function StartsWith($Haystack, $Needle){
     return strpos($Haystack, $Needle) === 0;
+  }
+  
+  function sendConsole($message, $level=0) {
+    switch($level) {
+      case 0:
+        echo '[Info] '.$message.nl;
+      break;
+      case 1:
+        echo '[Warning] '.$message.nl;
+      break;
+      case 2:
+        echo '[Error] '.$message.nl;
+      break;
+      case 3:
+        die('[Fatal Error] '.$message);
+      break;
+      case 4:
+        echo $message.nl;
+      break;
+    }
   }
 }
 

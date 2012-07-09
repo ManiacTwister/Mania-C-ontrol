@@ -11,6 +11,7 @@
   <db_name>maniacontrol</db_name>
 
   <plugins>
+    <plugin>plugin.basic.php</plugin>
     <plugin>plugin.database.php</plugin>
     <plugin>plugin.infomessages.php</plugin>
   </plugins>
