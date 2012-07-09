@@ -70,7 +70,7 @@ class ManiaControl {
     '# IP: '.$response['PublishedIp'].':'.$response['Port'].nl.
     '# Login: '.$response['ServerLogin'].nl.
     '######################'
-    , 4);
+    , 5);
     $this->client->query('EnableCallbacks', true);
     $this->client->query('ChatSendServerMessage', '$o$aaaMania$09f[C]$aaaontrol started!');
     $this->serverlogin = $response['ServerLogin'];
@@ -179,7 +179,7 @@ class ManiaControl {
         '# Author: ManiacTwister (Some ideas from XAseco by Xymph)'. nl.
         '#'.nl.
         '###############################################################################'
-      , 4);
+      , 5);
     } else { 
       $this->sendConsole('Could not load config file!', 3); 
     }
@@ -244,22 +244,26 @@ class ManiaControl {
   }
   
   function sendConsole($message, $level=0) {
+    $date = '['.date('m/d,H:i:s').'] ';
     switch($level) {
       case 0:
-        echo '[Info] '.$message.nl;
+        echo $date.'[Info] '.$message.nl;
       break;
       case 1:
-        echo '[Warning] '.$message.nl;
+        echo $date.'[Warning] '.$message.nl;
       break;
       case 2:
-        echo '[Error] '.$message.nl;
+        echo $date.'[Error] '.$message.nl;
       break;
       case 3:
-        die('[Fatal Error] '.$message);
+        die($date.'[Fatal Error] '.$message);
       break;
       case 4:
+        echo $date.$message.nl;
+        break;
+      case 5:
         echo $message.nl;
-      break;
+        break;
     }
   }
 }

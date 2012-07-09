@@ -12,3 +12,5 @@ Installation
 * Run maniacontrol/maniacontrol.sh
 
 If you have any questions contact me under maniactwister -ät- s7t.de  OR  maniactwister@jabber.s7t.de
+
+And please, do not expect too much - i made this in about 5hours. But everything should be implementable with plugins.

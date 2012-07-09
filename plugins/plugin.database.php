@@ -147,9 +147,8 @@ function showScores($control, $limit=6) {
       $y = number_format(($lheight * $line + $offset), 1, '.', ',');
       $body .= '<label posn="4 -'.$y.' 0.002" sizen="3.4 1.7" halign="right" scale="0.9" textcolor="DDDF" text="'.formatScore($item[1], $what).'"/>';
       $body .= '<label posn="4.65 -'.$y.' 0.002" sizen="11.1 1.7" scale="0.9" text="'.$item[0].'"/>';
-      echo $y.nl;
-      $line ++;
 
+      $line ++;
       if ($line >= $limit) {
         break;
       }
