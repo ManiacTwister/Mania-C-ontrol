@@ -95,7 +95,7 @@ class ManiaControl {
             $this->client->query('ChatSendServerMessage', '$z$sNew Player: '.$response['NickName'].'$z$s Zone: $fff'.$response['Path'].'$z$s Ladder: $fff'.$response['LadderStats']['PlayerRankings'][0]['Ranking']);
             $this->client->query('GetServerName');
             $response = $this->client->getResponse();
-            $this->client->query('ChatSendServerMessageToLogin', '$z$sWelcome on '.$response.nl.'$z$sThis Server is running with $l[http://github.com/maniactwister/maniacontrol]$o$aaaMania$09f[C]$aaaontrol$l!', $calls[0][1][0]);
+            $this->client->query('ChatSendServerMessageToLogin', '$z$sWelcome on '.$response.nl.'$z$sThis Server is running with $l[https://github.com/ManiacTwister/Mania-C-ontrol]$o$aaaMania$09f[C]$aaaontrol$l!', $calls[0][1][0]);
             break;
           case 'ManiaPlanet.PlayerDisconnect':
             $this->releaseEvent('PlayerDisconnect', $this->players[$calls[0][1][0]], '');
