@@ -89,12 +89,13 @@ function db_ModeScriptCallback($control, $name, $params) {
       $stmt->bindParam(':login', $params);
     break;
     case 'playerHit':
-      $players = explode(';', $param);
+      $players = explode(';', $params);
       $victim = str_replace('Victim:', '', $players[0]);
       $shooter = str_replace('Shooter:', '', $players[1]);
       $points = $players[2];
-      $stmt = $dbc->prepare("UPDATE players SET hits = hits+1 WHERE login = :shooter; UPDATE player set got_hit = got_hit+1 WHERE login = :victim");
-      $stmt->bindParam(':shooter', $points);
+      
+      $stmt = $dbc->prepare("UPDATE players SET hits = hits+1 WHERE login = :shooter; UPDATE players SET got_hit = got_hit+1 WHERE login = :victim");
+      $stmt->bindParam(':shooter', $shooter);
       $stmt->bindParam(':victim', $victim);
     break;
     case 'playerRespawn':
